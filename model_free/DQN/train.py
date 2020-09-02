@@ -10,8 +10,8 @@ def main(cf):
     state_dim = env.observation_space.shape[0]
     action_dim = env.action_space.n
     
-    ag = Agent(env, state_dim, action_dim, cf)
-    ag.train(max_frames)
+    ag = Agent(cf, env, state_dim, action_dim)
+    ag.run(max_frames, cf.atari_games[0], render=False)
 
 if __name__ == "__main__":
     cf = Config()

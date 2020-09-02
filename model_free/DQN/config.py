@@ -1,4 +1,10 @@
 class Config():
     def __init__(self):
 
-        self.atari_games = {1:}
+        self.atari_games = {
+            0:'BreakoutDeterministic-v0',
+            1:'BoxingDeterministic-v0',
+            2:'MontezumaRevenge-ramDeterministic-v0',
+            3:'SeaquestDeterministic-v0',
+            4:'SpaceInvadersDeterministic-v0'
+            }
