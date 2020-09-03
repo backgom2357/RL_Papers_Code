@@ -1,4 +1,4 @@
-from network import *
+from network import build_model
 from replay_memory import ReplayMemory
 from utils import *
 import numpy as np
@@ -80,8 +80,8 @@ class Agent:
 
         while frames < max_frame:
 
-            if render:
-                self.env.render()
+            # if render:
+            #     self.env.render()
 
             # Interact with Environmnet
             action, q = self.get_action(normalize(state))
@@ -93,7 +93,7 @@ class Agent:
             self.replay_memory.append(state, action, reward, next_state, done)
 
             # Start Training After Collecting Enough Samples
-            if self.relay_memeory.crt < self.cf.REPLAY_START_SIZE and not self.replay_memory.is_full():
+            if self.relay_memeory.crt_idx < self.cf.REPLAY_START_SIZE and not self.replay_memory.is_full():
                 state = next_state
                 continue
             
@@ -115,7 +115,7 @@ class Agent:
                 episode += 1
 
                 # Update Logs
-                print(f'Epi : {self.episode,}, Reward : {episodic_rewards}, Q : {episodic_mean_q}')
+                print(f'Epi : {episode}, Reward : {episodic_rewards}, Q : {episodic_mean_q}')
                 # wandb.log({
                 #     'Reward':episode_reward, 
                 #     'Q value':episodic_mean_q, 
@@ -123,7 +123,7 @@ class Agent:
 
                 # Save Model
                 if episode % 1000 == 0:
-                    self.q.save_weights('./save_weights/'+game_name+'_'+str(self.episode)+'epi.h5')
+                    self.q.save_weights('./save_weights/'+game_name+'_'+str(episode)+'epi.h5')
 
                 # Initializing
                 sum_mean_q, episodic_rewards = 0, 0
