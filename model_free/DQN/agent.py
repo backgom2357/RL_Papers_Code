@@ -7,6 +7,7 @@ import tensorflow as tf
 import os
 # import wandb
 
+
 class Agent:
     def __init__(self, config, env, state_dim, action_dim):
         
@@ -35,15 +36,15 @@ class Agent:
         Epsilon Greedy
         """
         q = self.q(state)[0]
-        return np.argmax(q), q if self.cf.EPSILON < np.random.rand() else np.random.randint(self.action_dim), q
+        return np.argmax(q), q if self.cf.epsilon < np.random.rand() else np.random.randint(self.action_dim), q
 
     def model_train(self):
         # Sample From Replay Memory
         states, actions, rewards, next_states, dones = self.replay_memory.sample(self.cf.BATCH_SIZE)
 
         # Epsilon Decay (+ exponentially)
-        if self.cf.EPSILON > self.cf.FINAL_EXPLORATION:
-            self.cf.EPSILON -= (1 + self.cf.FINAL_EXPLORATION)/(self.cf.FINAL_EXPLORATION_FRAME*self.cf.EPSILON)
+        if self.cf.epsilon > self.cf.FINAL_EXPLORATION:
+            self.cf.epsilon -= (1 + self.cf.FINAL_EXPLORATION)/(self.cf.FINAL_EXPLORATION_FRAME*self.cf.epsilon)
         
         # Update Weights
         with tf.GradientTape() as g:
