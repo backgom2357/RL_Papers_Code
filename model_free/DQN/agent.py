@@ -1,6 +1,6 @@
 from network import build_model
 from replay_memory import ReplayMemory
-from utils import *
+from utils import preprocess, normalize
 import numpy as np
 import cv2
 import tensorflow as tf
