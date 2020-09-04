@@ -62,7 +62,7 @@ class Agent:
             predicts = tf.reduce_sum(predicts * tf.one_hot(actions, self.action_dim), axis=1)
             loss = self.loss(targets, predicts)
         g_theta = g.gradient(loss, self.q.trainable_weights)
-        self.optimizer.apply_gradients(g_theta, self.q.trainable_weights)
+        self.optimizer.apply_gradients(zip(g_theta, self.q.trainable_weights))
 
 
     def run(self, max_frame, game_name, render=False):
@@ -116,7 +116,7 @@ class Agent:
                 self.target_q.set_weights(self.q.get_weights())
 
             if done:
-                episodic_mean_q = sum_mean_q/frames(self.cf.SKIP_FRAMES + 1)
+                episodic_mean_q = sum_mean_q/frames * (self.cf.SKIP_FRAMES + 1)
                 episode += 1
 
                 # Update Logs
@@ -129,14 +129,16 @@ class Agent:
                 # Save Model
                 if new_record < episodic_rewards:
                     new_record = episodic_rewards
-                    self.q.save_weights('./save_weights/'+game_name+'_'+str(new_record)+'epi.h5')
+                    self.q.save_weights('/home/ubuntu/RL_Papers_Code/save_weights/'+game_name+'_'+str(new_record)+'epi.h5')
 
                 # Initializing
                 sum_mean_q, episodic_rewards = 0, 0
-                action = 0
-                initial_state = self.evn.reset()
+                frames, action = 0, 0
+                initial_state = self.env.reset()
                 state = np.stack([preprocess(initial_state, frame_size=self.cf.FRAME_SIZE)]*4, axis=3)
-                state = np.reshape(state, (1, *state.shape))
+                state = np.reshape(state, state.shape[:-1])
+
+                # No Ops
                 for _ in range(self.cf.NO_OPS):
                     next_state, _, _,  _ = self.env.step(0)
                     next_state = np.append(state[..., 1:], preprocess(next_state, frame_size=self.cf.FRAME_SIZE), axis=3)
