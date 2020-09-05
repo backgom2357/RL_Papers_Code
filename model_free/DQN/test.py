@@ -37,7 +37,8 @@ def test(cf, env_name, weights_url, render=False, check_input_frames=False, chec
             env.render()
 
         # Interact with Environmnet
-        action = np.argmax(normalize(state))
+        action = np.argmax(model(normalize(state)))
+        print(action)
         next_state, reward, done, _ = env.step(action)
         reward = np.clip(reward, -1, 1)
         next_state = np.append(state[..., 1:], preprocess(next_state, frame_size=cf.FRAME_SIZE), axis=3)
@@ -72,12 +73,18 @@ def test(cf, env_name, weights_url, render=False, check_input_frames=False, chec
         
         # Check Log & Plot
         if check_log_plot:
+
+            # Jupter Notebook Matplotlib Setting
+            is_ipython = 'inline' in matplotlib.get_backend()
+            if is_ipython:
+                from IPython import display
+            plt.ion()
+
             q = np.array(model(normalize(state))[0])
             plot_durations(q, is_ipython)
             # print(action, q, end='\r')
             print(action, max(q), min(q), sum(q)/action_dim, end='\r')
-
-    plt.ioff()
+            plt.ioff()
 
 
 def generate_grad_cam(model, state, reward, action, next_state, done, activation_layer, output_layer):
@@ -127,12 +134,6 @@ def plot_durations(q, is_ipython):
         is_ipython (bool): ipython or not
     """
 
-    # Jupter Notebook Matplotlib Setting
-    is_ipython = 'inline' in matplotlib.get_backend()
-    if is_ipython:
-        from IPython import display
-    plt.ion()
-
     ACTION_MEANING = {
     0: "NOOP",
     1: "FIRE",
@@ -174,5 +175,5 @@ def plot_durations(q, is_ipython):
 
 if __name__ == "__main__":
     cf = Config()
-    env_setting = [cf.ATARI_GAMES[0], './save_weights/dqn_breakout_resnet_like_2000epi.h5']
-    test(cf=cf, *env_setting, check_saliency_map=True)
+    env_setting = [cf.ATARI_GAMES[1], './save_weights/bbb.h5']
+    test(cf, *env_setting, check_input_frames=True, check_log_plot=True, check_saliency_map=True)
