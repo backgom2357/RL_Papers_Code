@@ -129,7 +129,7 @@ class Agent:
                 # Save Model
                 if new_record < episodic_rewards:
                     new_record = episodic_rewards
-                    self.q.save_weights('/home/ubuntu/RL_Papers_Code/save_weights/'+game_name+'_'+str(new_record)+'epi.h5')
+                    self.q.save_weights('/home/ubuntu/RL_Papers_Code/save_weights/'+game_name+'_'+str(int(new_record))+'.h5')
 
                 # Initializing
                 sum_mean_q, episodic_rewards = 0, 0
