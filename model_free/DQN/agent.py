@@ -133,7 +133,6 @@ class Agent:
 
                 # Initializing
                 sum_mean_q, episodic_rewards = 0, 0
-                frames, action = 0, 0
                 initial_state = self.env.reset()
                 state = np.stack([preprocess(initial_state, frame_size=self.cf.FRAME_SIZE)]*4, axis=3)
                 state = np.reshape(state, state.shape[:-1])
