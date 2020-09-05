@@ -54,11 +54,11 @@ class Agent:
         # Update Weights
         with tf.GradientTape() as g:
             # Maximum q value of next state from target q function
-            max_next_q = np.max(self.target_q(next_states), axis=1)
+            max_next_q = np.max(self.target_q(normalize(next_states)), axis=1)
 
             # Calculate Targets
             targets = rewards + (1 - dones) * (self.cf.DISCOUNT_FACTOR * max_next_q)
-            predicts = self.q(states)
+            predicts = self.q(normalize(states))
             predicts = tf.reduce_sum(predicts * tf.one_hot(actions, self.action_dim), axis=1)
             loss = self.loss(targets, predicts)
         g_theta = g.gradient(loss, self.q.trainable_weights)
