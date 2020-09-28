@@ -6,7 +6,10 @@ class Config():
             1:'BoxingDeterministic-v0',
             2:'MontezumaRevenge-ramDeterministic-v0',
             3:'SeaquestDeterministic-v0',
-            4:'SpaceInvadersDeterministic-v0'
+            4:'SpaceInvadersDeterministic-v0',
+            5:'PongDeterministic-v4',
+            6:'EnduroDeterministic-v4',
+            7:'BeamRiderDeterministic-v4'
             }
         
         self.AGENT_HISTORY_LENGHTH = 4
@@ -19,7 +22,7 @@ class Config():
         self.NO_OPS = 30
         self.REPLAY_MEMORY_SIZE = 1000000
         self.REPLAY_START_SIZE = 50000
-        self.SKIP_FRAMES = 4
+        self.SKIP_FRAMES = 0
         self.TARGET_NETWORK_UPDATE_FREQUENCY = 10000
         
         self.epsilon = 1
