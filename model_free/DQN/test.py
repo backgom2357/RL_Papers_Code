@@ -38,7 +38,6 @@ def test(cf, env_name, weights_url, render=False, check_input_frames=False, chec
 
         # Interact with Environmnet
         action = np.argmax(model(normalize(state)))
-        print(action)
         next_state, reward, done, _ = env.step(action)
         reward = np.clip(reward, -1, 1)
         next_state = np.append(state[..., 1:], preprocess(next_state, frame_size=cf.FRAME_SIZE), axis=3)
@@ -60,7 +59,7 @@ def test(cf, env_name, weights_url, render=False, check_input_frames=False, chec
             cm = plt.get_cmap('jet')
 
             # Saliency Map
-            grad_img = generate_grad_cam(model, state, reward, action, next_state, done, 'conv2d', output_layer='dense')
+            grad_img = generate_grad_cam(model, state, reward, action, next_state, done, 'conv2d_6', output_layer='global_average_pooling2d')
             grad_img = np.reshape(grad_img, (cf.FRAME_SIZE, cf.FRAME_SIZE))
             grad_img = cm(grad_img)[:,:,:3]
             screen = env.render(mode='rgb_array')
@@ -110,18 +109,18 @@ def generate_grad_cam(model, state, reward, action, next_state, done, activation
     # Calculate gradient for weights
     with tf.GradientTape() as g:
         layer_output, pred = grad_cam_model(normalize(state))
-        grad = g.gradient(pred, layer_output)[0]
+        grad = g.gradient(pred[0][tf.argmax(pred, axis=1)[0]], layer_output)[0]
     weights = np.mean(grad, axis=(0,1))
-
+ 
     # Create Grad-CAM image
-    grad_cam_image = np.zeros(dtype=np.float32, shape=layer_output.shape[0:2])
+    grad_cam_image = np.zeros(dtype=np.float32, shape=layer_output.shape[1:3])
     for i, w in enumerate(weights):
-        grad_cam_image = w * layer_output[0, :, :, i]
+        grad_cam_image += w * layer_output[0, :, :, i]
 
     grad_cam_image /= np.max(grad_cam_image)
     grad_cam_image = grad_cam_image.numpy()
     grad_cam_image = cv2.resize(grad_cam_image, (width, height))
-    
+
     return grad_cam_image
 
 
@@ -175,5 +174,5 @@ def plot_durations(q, is_ipython):
 
 if __name__ == "__main__":
     cf = Config()
-    env_setting = [cf.ATARI_GAMES[1], './save_weights/bbb.h5']
-    test(cf, *env_setting, check_input_frames=True, check_log_plot=True, check_saliency_map=True)
+    env_setting = [cf.ATARI_GAMES[6], './save_weights/bbb.h5']
+    test(cf, *env_setting, render=True, check_saliency_map=True)
