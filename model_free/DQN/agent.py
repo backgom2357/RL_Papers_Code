@@ -5,7 +5,7 @@ import numpy as np
 import cv2
 import tensorflow as tf
 import os
-import wandb
+# import wandb
 
 class Agent:
     def __init__(self, config, env, state_dim, action_dim):
@@ -31,10 +31,10 @@ class Agent:
         self.q.summary()
 
         # Save Logs
-        wandb.init(
-            project="fully_conv_layer_test",
-            name='vanilla_DQN',
-            config=self.cf.WANDB)
+        # wandb.init(
+        #     project="fully_conv_layer_test",
+        #     name='vanilla_DQN_'+ str(env)[20:-3],
+        #     config=self.cf.WANDB)
 
     def get_action(self, state):
         """
@@ -49,7 +49,7 @@ class Agent:
 
         # Epsilon Decay (+ exponentially)
         if self.cf.epsilon > self.cf.FINAL_EXPLORATION:
-            self.cf.epsilon -= (1 + self.cf.FINAL_EXPLORATION)/(self.cf.FINAL_EXPLORATION_FRAME*self.cf.epsilon)
+            self.cf.epsilon -= (1 + self.cf.FINAL_EXPLORATION)/self.cf.FINAL_EXPLORATION_FRAME
         
         # Update Weights
         with tf.GradientTape() as g:
@@ -121,16 +121,23 @@ class Agent:
 
                 # Update Logs
                 print(f'Epi : {episode}, Reward : {episodic_rewards}, Q : {episodic_mean_q}')
-                wandb.log({
-                    'Reward':episodic_rewards, 
-                    'Q value':episodic_mean_q,
-                    })
+                # wandb.log({
+                #     'Reward':episodic_rewards, 
+                #     'Q value':episodic_mean_q,
+                #     'Epsilon':self.cf.epsilon,
+                #     })
 
                 # Save Model
                 if new_record < episodic_rewards:
                     new_record = episodic_rewards
-                    self.q.save_weights('/home/ubuntu/RL_Papers_Code/save_weights/'+game_name+'_'+str(int(new_record))+'.h5')
+                    try:
+                        self.q.save_weights(f'../save_weights/{game_name}/{game_name}_{str(int(new_record))}.h5')
+                    except:
+                        os.makedirs(f'../save_weights/{game_name}/')
+                        self.q.save_weights(f'../save_weights/{game_name}/{game_name}_{str(int(new_record))}.h5')
+                    wandb.save(f'../save_weights/{game_name}/{game_name}_{str(int(new_record))}.h5', policy='live')
 
+                        
                 # Initializing
                 sum_mean_q, episodic_rewards = 0, 0
                 initial_state = self.env.reset()
