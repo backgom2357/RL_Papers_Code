@@ -59,7 +59,7 @@ def test(cf, env_name, weights_url, render=False, check_input_frames=False, chec
             cm = plt.get_cmap('jet')
 
             # Saliency Map
-            grad_img = generate_grad_cam(model, state, reward, action, next_state, done, 'conv2d_6', output_layer='global_average_pooling2d')
+            grad_img = generate_grad_cam(model, state, reward, action, next_state, done, 'conv2d_5', output_layer='global_average_pooling2d')
             grad_img = np.reshape(grad_img, (cf.FRAME_SIZE, cf.FRAME_SIZE))
             grad_img = cm(grad_img)[:,:,:3]
             screen = env.render(mode='rgb_array')
@@ -174,5 +174,5 @@ def plot_durations(q, is_ipython):
 
 if __name__ == "__main__":
     cf = Config()
-    env_setting = [cf.ATARI_GAMES[6], './save_weights/bbb.h5']
+    env_setting = [cf.ATARI_GAMES[6], '/home/backgom2357/RL_Papers_Code/model_free/DQN/save_weights/bbb.h5']
     test(cf, *env_setting, render=True, check_saliency_map=True)
